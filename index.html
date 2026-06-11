@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Salas Online - Troca Instantânea</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <style>
+    body {
+      margin-top: 60px; margin-right: 0; 
+      font-family: Arial, sans-serif; background-color: #1a1a1a; color: white; overflow-x: hidden;
+      padding-bottom: 200px; 
+    }
+    .top-bar {
+      position: fixed; top: 0; left: 0; width: 100%; background-color: #333; 
+      color: white; padding: 5px 15px; display: flex; align-items: center; justify-content: space-between;
+      box-sizing: border-box; z-index: 1001; height: 50px;
+    }
+    
+    .top-bar-left { flex: 1; display: flex; align-items: center; min-width: 120px; }
+    #status-load { font-size: 10px; color: #007bff; font-weight: bold; }
+    
+    .top-bar-center { flex: 1; display: flex; justify-content: center; gap: 8px; position: relative; }
+    
+    #room-counter {
+      position: absolute;
+      right: -130px; 
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 11px;
+      color: #007bff;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .top-bar-right { flex: 2; display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+
+    /* Estilo do status de sincronização posicionado ao lado do timer */
+    #sync-status { font-size: 10px; color: #007bff; font-weight: bold; margin-left: 15px; white-space: nowrap; }
+
+    .filters-group-wrapper { display: flex; gap: 5px; align-items: center; }
+
+    .dropdown { position: relative; display: inline-block; }
+    
+    .dropbtn {
+      background-color: #444; color: white; padding: 5px 8px; font-size: 11px;
+      border: none; cursor: pointer; border-radius: 4px; position: relative;
+      min-width: 90px; text-align: center;
+    }
+
+    /* Estilos do novo botão de modo */
+    .mode-dropbtn {
+      background-color: #444; color: white; padding: 5px 10px; font-size: 12px;
+      border: none; border-radius: 3px; cursor: pointer; min-width: 80px;
+    }
+    #mode-selector-wrapper { margin-right: 40px; }
+
+    .dropdown:hover .dropbtn { background-color: #555; }
+    
+    .dropdown-content {
+      display: none; position: absolute; background-color: #222; min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); z-index: 1005; border-radius: 4px;
+      max-height: 80vh; overflow-y: auto; right: 0; margin-top: 2px;
+    }
+    .dropdown-content.show { display: block; }
+    
+    .filter-opt {
+      padding: 10px 12px; font-size: 11px; cursor: pointer; display: block; border-bottom: 1px solid #333; text-align: left;
+    }
+    .filter-opt:hover { background-color: #333; }
+    .filter-opt.active { background-color: #328a06; font-weight: bold; }
+    
+    .filter-counter {
+      position: absolute; top: -6px; right: -6px; background-color: #007bff;
+      color: white; border-radius: 50%; width: 14px; height: 14px;
+      font-size: 9px; display: flex; align-items: center; justify-content: center;
+      border: 1px solid #333; font-weight: bold;
+    }
+
+    .btn-clear-all {
+      background-color: #ff4444; color: white; border: none; padding: 5px 10px;
+      font-size: 11px; border-radius: 4px; cursor: pointer; font-weight: bold; white-space: nowrap;
+    }
+
+    #galeria { display: flex; flex-wrap: wrap; gap: 15px; padding: 20px; justify-content: center; min-height: 200px; }
+    .image-wrapper { text-decoration: none; color: #ccc; width: 192px; display: inline-block; position: relative; }
+    .thumbnail-container { display: flex; flex-direction: column; align-items: center; background: #252525; border-radius: 4px; padding-bottom: 5px; position: relative; }
+    
+    .user-footer { 
+      width: 100%; display: flex; align-items: center; justify-content: space-between; 
+      position: relative; padding: 2px 10px; box-sizing: border-box; 
+    }
+    
+    .cycle-count { font-size: 9px; color: #888; width: 45px; text-align: left; white-space: nowrap; }
+    .cycle-green { color: #2ecc71 !important; font-weight: bold; }
+    .cycle-orange { color: #e67e22 !important; font-weight: bold; }
+
+    .user-footer .name-text { font-size: 11px; text-align: center; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
+    .user-footer .star-dock { font-size: 14px; width: 45px; text-align: right; display: flex; justify-content: flex-end; }
+    
+    .info-overlay {
+      position: absolute; top: 108px; left: 0; width: 100%; background: #252525; color: #eee;
+      font-size: 11px; display: flex; flex-direction: column; padding: 5px 10px 10px 10px;
+      box-sizing: border-box; opacity: 0; visibility: hidden; transition: opacity 0.2s ease-in-out, visibility 0.2s;
+      border-radius: 0 0 4px 4px; z-index: 20; box-shadow: 0 10px 15px rgba(0,0,0,0.5); pointer-events: none;
+    }
+    .image-wrapper:hover .info-overlay { opacity: 1; visibility: visible; }
+    .info-overlay p { margin: 3px 0; line-height: 1.2; border-bottom: 1px solid #333; padding-bottom: 2px; }
+    
+    .star-favorite { color: #666; } 
+    .star-active { color: #ffdb58; } 
+    .text-grey { color: #666 !important; }
+    .room_thumbnail { background: #333; border-radius: 4px 4px 0 0; min-height: 108px; border: none; }
+    .filter-button { cursor: pointer; padding: 5px 10px; border-radius: 3px; background-color: #444; font-size: 12px; white-space: nowrap; }
+    .filter-button.selected { background-color: #328a06; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-bar-left">
+    <div id="status-load">Iniciando...</div>
+    <div id="sync-status">Sincronizado</div>
+  </div>
+  
+  <div class="top-bar-center">
+    <div class="dropdown" id="mode-selector-wrapper">
+      <button class="mode-dropbtn" id="current-mode" onclick="toggleDropdown('mode', event)">Chaturbate</button>
+      <div class="dropdown-content" id="dropdown-content-mode">
+        <span class="filter-opt" onclick="setMode('Chaturbate', event)">Chaturbate</span>
+        <span class="filter-opt" onclick="setMode('Recu', event)">Recu</span>
+        <span class="filter-opt" onclick="setMode('Editar', event)">Editar</span>
+      </div>
+    </div>
+
+    <span class="filter-button" id="filter-online">Online</span>
+    <span class="filter-button" id="filter-recent">Recente</span>
+    <span class="filter-button" id="filter-all">Todos</span>
+    <span id="room-counter">Exibindo 0 salas</span>
+  </div>
+
+  <div class="top-bar-right">
+    <div class="filters-group-wrapper" id="filter-dropdowns"></div>
+    <button class="btn-clear-all" onclick="clearAllFilters()">Limpar Tudo</button>
+  </div>
+</div>
+
+<div id="galeria"></div>
+
+<script src="listname.js"></script>
+
+<script>
+  let activeFilters = { online_time: [], age_group: [], ethnicity: [], physical: [], type_a: [], type_b: [], favorite: [] };
+  let countdownInterval = null;
+  let lastProcessedData = []; 
+  let imageIntervals = {};
+
+  // Lógica de Modos e Links
+  function setMode(mode, event) {
+    if (event) event.stopPropagation();
+    localStorage.setItem('selectedViewMode', mode);
+    document.getElementById('current-mode').innerText = mode;
+    document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+    if (lastProcessedData.length > 0) renderGaleria(lastProcessedData);
+  }
+
+  function getTargetLink(userName) {
+    const mode = localStorage.getItem('selectedViewMode') || 'Chaturbate';
+    if (mode === 'Chaturbate') return `https://chaturbate.com/${userName}/`;
+    if (mode === 'Recu') return `https://recu.me/performer/${userName}/`;
+    if (mode === 'Editar') return `EditorListName.html?search=${userName}`;
+    return `https://chaturbate.com/${userName}/`;
+  }
+
+  // Funções de Imagem e Ciclo
+  function handleImageHover(imgElement, userName) {
+    if (imageIntervals[userName]) clearInterval(imageIntervals[userName]);
+    const updateImg = () => { imgElement.src = `https://thumb.live.mmcdn.com/riw/${userName}.jpg?t=${Date.now()}`; };
+    updateImg();
+    imageIntervals[userName] = setInterval(updateImg, 5000);
+  }
+
+  function stopImageHover(userName) {
+    if (imageIntervals[userName]) { clearInterval(imageIntervals[userName]); delete imageIntervals[userName]; }
+  }
+
+  async function getImageSizeInKb(url) {
+    try {
+      const resp = await fetch(url);
+      const len = resp.headers.get("Content-Length");
+      if (len) return parseInt(len, 10) / 1024;
+      const blob = await resp.blob();
+      return blob.size / 1024;
+    } catch (e) { return 0; }
+  }
+
+  function startCountdown(seconds) {
+    const status = document.getElementById("status-load");
+    if (countdownInterval) clearInterval(countdownInterval);
+    let remaining = seconds;
+    countdownInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) { 
+        clearInterval(countdownInterval); 
+        status.innerText = "Sincronizando..."; 
+      } 
+      else { 
+        status.innerText = `Próxima: ${Math.floor(remaining / 60)}:${(remaining % 60).toString().padStart(2, '0')}`; 
+      }
+    }, 1000);
+  }
+
+  // Filtros e Renderização
+  function applyAllFilters() {
+    const statusFilter = localStorage.getItem('selectedFilter') || 'all';
+    const items = document.querySelectorAll("#galeria .image-wrapper");
+    let visibleCount = 0;
+
+    items.forEach(link => {
+      const uData = lastProcessedData.find(x => x.name === link.getAttribute("data-name"));
+      if (!uData) return;
+      const isGrey = link.getAttribute("data-grey") === "true";
+      let passStatus = (statusFilter === 'all') || (statusFilter === 'online' && !isGrey) || (statusFilter === 'recent' && isGrey);
+      let passTime = true;
+      if (activeFilters.online_time.length > 0) {
+        passTime = false;
+        const mins = uData.totalMinutes || 0;
+        if (activeFilters.online_time.includes("Abaixo de 15 min") && mins <= 15) passTime = true;
+        if (activeFilters.online_time.includes("Entre 15 e 120 min") && mins > 15 && mins < 120) passTime = true;
+        if (activeFilters.online_time.includes("Acima de 120 min") && mins >= 120) passTime = true;
+      }
+      let passSidebar = true;
+      for (let field in activeFilters) {
+        if (field === 'online_time') continue; 
+        if (activeFilters[field].length > 0 && !activeFilters[field].includes(uData[field])) { passSidebar = false; break; }
+      }
+      const isVisible = (passStatus && passTime && passSidebar);
+      link.style.display = isVisible ? "inline-block" : "none";
+      if (isVisible) visibleCount++;
+    });
+    document.getElementById('room-counter').innerText = `Exibindo ${visibleCount} salas`;
+  }
+
+  function renderGaleria(processedData) {
+    const galeriaContainer = document.getElementById("galeria");
+    let bufferHtml = "";
+    processedData.forEach((u) => {
+      if (u.sizePass) {
+        const targetHref = getTargetLink(u.name);
+        const starClass = u.favorite === "★" ? "star-favorite star-active" : "star-favorite";
+        bufferHtml += `
+          <a href="${targetHref}" class="image-wrapper" target="_blank" data-name="${u.name}" data-grey="${u.isGrey}">
+            <div class="thumbnail-container">
+              <img width="192" height="108" src="https://thumb.live.mmcdn.com/riw/${u.name}.jpg?12345" class="room_thumbnail" loading="lazy" onmouseenter="handleImageHover(this, '${u.name}')" onmouseleave="stopImageHover('${u.name}')">
+              <div class="user-footer">
+                <span class="cycle-count ${u.cycleClass}">${u.timeLabel}</span>
+                <span class="name-text ${u.isGrey ? 'text-grey' : ''}">${u.name}</span>
+                <span class="star-dock"><span class="${starClass}">${u.favorite}</span></span>
+              </div>
+              <div class="info-overlay">
+                <p><strong>Name:</strong> ${u.name}</p>
+                <p><strong>Age:</strong> ${u.age_group}</p>
+                <p><strong>Ethnicity:</strong> ${u.ethnicity}</p>
+                <p><strong>Physical:</strong> ${u.physical}</p>
+                <p><strong>Type A:</strong> ${u.type_a}</p>
+                <p><strong>Type B:</strong> ${u.type_b}</p>
+              </div>
+            </div>
+          </a>`;
+      }
+    });
+    galeriaContainer.innerHTML = bufferHtml;
+    applyAllFilters();
+  }
+
+  async function startSilentUpdate() {
+    const syncStatus = document.getElementById("sync-status");
+    let processedData = [];
+    const batchSize = 40;
+    const oldCycleData = JSON.parse(localStorage.getItem('online_cycles') || '{}');
+    const newCycleData = {};
+
+    for (let i = 0; i < USUARIOS_DATA.length; i += batchSize) {
+      const batch = USUARIOS_DATA.slice(i, i + batchSize);
+      const batchResults = await Promise.all(batch.map(async (u) => {
+        const imageUrl = `https://thumb.live.mmcdn.com/riw/${u.name}.jpg?12345`;
+        const size = await getImageSizeInKb(imageUrl);
+        const stored = localStorage.getItem(imageUrl);
+        const isGrey = (stored && parseFloat(stored) === size);
+        localStorage.setItem(imageUrl, size.toString());
+        let timeLabel = "-"; let cycleClass = ""; let totalMinutes = 0;
+        if (!isGrey) {
+            const currentCycles = (oldCycleData[u.name] || 0) + 1;
+            newCycleData[u.name] = currentCycles;
+            totalMinutes = Math.floor(currentCycles * 2.5);
+            timeLabel = totalMinutes + " min";
+            if (totalMinutes <= 15) cycleClass = "cycle-green";
+            else if (totalMinutes >= 120) cycleClass = "cycle-orange";
+        }
+        return { ...u, isGrey, timeLabel, cycleClass, totalMinutes, sizePass: (size > 9.29 || size < 9.27) };
+      }));
+      processedData.push(...batchResults);
+      // Atualiza apenas a porcentagem no elemento ao lado do timer
+      syncStatus.innerText = `Sinc: ${Math.round((processedData.length/USUARIOS_DATA.length)*100)}%`;
+    }
+    localStorage.setItem('online_cycles', JSON.stringify(newCycleData));
+    lastProcessedData = processedData;
+    renderGaleria(processedData);
+    
+    // Retorna o texto para "Sincronizado" quando termina
+    syncStatus.innerText = "Sincronizado";
+    startCountdown(150);
+  }
+
+  // Dropdowns e inicialização
+  function toggleDropdown(field, event) {
+    event.stopPropagation();
+    const currentDropdown = document.getElementById('dropdown-content-' + field);
+    document.querySelectorAll('.dropdown-content').forEach(el => { if (el.id !== 'dropdown-content-' + field) el.classList.remove('show'); });
+    currentDropdown.classList.toggle('show');
+  }
+
+  function toggleFilter(field, val, event) {
+    event.stopPropagation();
+    const idx = activeFilters[field].indexOf(val);
+    if (idx > -1) activeFilters[field].splice(idx, 1); else activeFilters[field].push(val);
+    renderDropdowns(); applyAllFilters();
+    document.getElementById('dropdown-content-' + field).classList.add('show');
+  }
+
+  function clearAllFilters() {
+    Object.keys(activeFilters).forEach(f => activeFilters[f] = []);
+    renderDropdowns(); applyAllFilters();
+  }
+
+  function renderDropdowns() {
+    const container = document.getElementById('filter-dropdowns');
+    container.innerHTML = '';
+    Object.keys(activeFilters).forEach(field => {
+      let values = []; let label = field.replace('_',' ').toUpperCase();
+      if (field === 'online_time') { values = ["Abaixo de 15 min", "Entre 15 e 120 min", "Acima de 120 min"]; label = "TEMPO ONLINE"; }
+      else { values = [...new Set(USUARIOS_DATA.map(u => u[field]))].sort(); }
+      const count = activeFilters[field].length;
+      let html = `<div class="dropdown"><button class="dropbtn" onclick="toggleDropdown('${field}', event)">${label}${count > 0 ? `<span class="filter-counter">${count}</span>` : ''}</button><div class="dropdown-content" id="dropdown-content-${field}">`;
+      values.forEach(val => { html += `<span class="filter-opt ${activeFilters[field].includes(val) ? 'active' : ''}" onclick="toggleFilter('${field}', '${val}', event)">${val}</span>`; });
+      container.insertAdjacentHTML('beforeend', html + `</div></div>`);
+    });
+  }
+
+  window.onclick = function(event) {
+    if (!event.target.matches('.dropbtn') && !event.target.matches('.mode-dropbtn') && !event.target.closest('.dropdown-content')) {
+      document.querySelectorAll('.dropdown-content').forEach(d => d.classList.remove('show'));
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const savedMode = localStorage.getItem('selectedViewMode') || 'Chaturbate';
+    document.getElementById('current-mode').innerText = savedMode;
+    document.querySelectorAll('.filter-button').forEach(btn => {
+      let type = btn.id.replace('filter-','');
+      if(type === (localStorage.getItem('selectedFilter') || 'all')) btn.classList.add('selected');
+      btn.onclick = () => { 
+        localStorage.setItem('selectedFilter', type); 
+        document.querySelectorAll('.filter-button').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected'); applyAllFilters();
+      };
+    });
+    renderDropdowns(); startSilentUpdate();
+    setInterval(startSilentUpdate, 150000);
+  });
+</script>
+</body>
+</html>
