@@ -338,7 +338,7 @@
     container.innerHTML = '';
     Object.keys(activeFilters).forEach(field => {
       let values = []; let label = field.replace('_',' ').toUpperCase();
-      if (field === 'online_time') { values = ["Abaixo de 15 min", "Entre 15 e 120 min", "Acima de 120 min"]; label = "TEMPO ONLINE"; }
+      if (field === 'online_time') { values = ["Abaixo de 15 min", "Entre 15 e 120 min", "Acima de 120 min"]; label = "⏱️ TEMPO"; }
       else { values = [...new Set(USUARIOS_DATA.map(u => u[field]))].sort(); }
       const count = activeFilters[field].length;
       let html = `<div class="dropdown"><button class="dropbtn" onclick="toggleDropdown('${field}', event)">${label}${count > 0 ? `<span class="filter-counter">${count}</span>` : ''}</button><div class="dropdown-content" id="dropdown-content-${field}">`;
