@@ -59,7 +59,7 @@
     
     .dropdown-content {
       display: none; position: absolute; background-color: #222; min-width: 160px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); z-index: 1005; border-radius: 4px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5); z-index: 3500; border-radius: 4px;
       max-height: 80vh; overflow-y: auto; right: 0; margin-top: 2px;
     }
     .dropdown-content.show { display: block; }
@@ -91,9 +91,10 @@
       position: relative; padding: 2px 10px; box-sizing: border-box; 
     }
     
-    .cycle-count { font-size: 9px; color: #888; width: 45px; text-align: left; white-space: nowrap; }
+    .cycle-count { font-size: 9px; width: 45px; text-align: left; white-space: nowrap; }
     .cycle-green { color: #2ecc71 !important; font-weight: bold; }
     .cycle-orange { color: #e67e22 !important; font-weight: bold; }
+    .cycle-yellow { color: #f1c40f !important; font-weight: bold; } /* Nova cor para o tempo intermediário */
 
     .user-footer .name-text { font-size: 11px; text-align: center; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 5px; }
     .user-footer .star-dock { font-size: 14px; width: 45px; text-align: right; display: flex; justify-content: flex-end; }
@@ -106,6 +107,8 @@
     }
     .image-wrapper:hover .info-overlay { opacity: 1; visibility: visible; }
     .info-overlay p { margin: 3px 0; line-height: 1.2; border-bottom: 1px solid #333; padding-bottom: 2px; }
+    .ov-label { color: #888; font-weight: normal; }
+    .ov-val   { color: #fff; font-weight: bold; }
     
     .star-favorite { color: #666; } 
     .star-active { color: #ffdb58; } 
@@ -113,6 +116,106 @@
     .room_thumbnail { background: #333; border-radius: 4px 4px 0 0; min-height: 108px; border: none; }
     .filter-button { cursor: pointer; padding: 5px 10px; border-radius: 3px; background-color: #444; font-size: 12px; white-space: nowrap; }
     .filter-button.selected { background-color: #328a06; font-weight: bold; }
+
+    #btn-fav-star {
+      font-size: 18px; cursor: pointer; color: #444; line-height: 1;
+      transition: color 0.15s; user-select: none;
+    }
+    #btn-fav-star.active { color: #ffdb58; }
+
+    /* ── Hamburguês ── */
+    #hamburger-btn {
+      background: none; border: none; cursor: pointer; padding: 4px 8px;
+      display: flex; flex-direction: column; gap: 4px; justify-content: center;
+    }
+    #hamburger-btn span {
+      display: block; width: 20px; height: 2px; background: #ccc; border-radius: 2px;
+      transition: background 0.2s;
+    }
+    #hamburger-btn:hover span { background: #fff; }
+
+    /* ── Painel lateral ── */
+    #side-panel {
+      position: fixed; top: 50px; right: -52%; width: 50%; height: calc(100vh - 50px);
+      background: #1e1e1e; z-index: 2000; display: flex; flex-direction: column;
+      box-shadow: -4px 0 20px rgba(0,0,0,0.7);
+      transition: right 0.3s ease;
+      border-left: 1px solid #333;
+    }
+    #side-panel.open { right: 0; }
+
+    #side-panel-header {
+      padding: 10px 12px; background: #2a2a2a; display: flex; align-items: center;
+      gap: 8px; border-bottom: 1px solid #333; flex-shrink: 0; flex-wrap: wrap;
+    }
+    #side-panel-header input {
+      flex: 1; min-width: 120px; background: #111; border: 1px solid #444; color: #eee;
+      padding: 5px 8px; border-radius: 4px; font-size: 12px; outline: none;
+    }
+    #panel-status-filter { display: flex; gap: 4px; }
+    .panel-status-btn {
+      background: #444; color: #ccc; border: none; padding: 4px 9px; border-radius: 3px;
+      font-size: 11px; cursor: pointer; white-space: nowrap;
+    }
+    .panel-status-btn.active { background: #328a06; color: #fff; font-weight: bold; }
+
+    #panel-table-wrap { flex: 1; overflow-y: auto; font-size: 11px; }
+    #panel-table { width: 100%; border-collapse: collapse; }
+    #panel-table thead th {
+      position: sticky; top: 0; background: #2a2a2a; color: #aaa;
+      padding: 6px 8px; text-align: left; border-bottom: 1px solid #444;
+      font-size: 10px; text-transform: uppercase; white-space: nowrap; z-index: 1;
+      cursor: pointer; user-select: none;
+    }
+    #panel-table thead th:hover { color: #fff; }
+    #panel-table thead th .sort-arrow { margin-left: 3px; color: #7ab; font-size: 9px; }
+    #panel-table thead th.sort-active { color: #fff; }
+    #panel-table thead th.sort-active .sort-arrow { color: #5bf; }
+    #panel-table tbody tr { border-bottom: 1px solid #2a2a2a; cursor: pointer; }
+    #panel-table tbody tr:hover { background: #2d2d2d; }
+    #panel-table tbody tr.highlighted { background: #1a3a5c !important; }
+    #panel-table tbody td {
+      padding: 5px 8px; color: #ccc; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; max-width: 130px;
+    }
+    .panel-status-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: middle;
+    }
+    .dot-online { background: #2ecc71; }
+    .dot-recent { background: #e67e22; }
+    .dot-absent { background: #555; }
+    .absent-fresh { color: #2ecc71; }
+    .absent-mid   { color: #f1c40f; }
+    .absent-old   { color: #e67e22; }
+    .absent-stale { color: #666; }
+
+    /* ── Modal card ── */
+    #panel-modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+      z-index: 3000; align-items: center; justify-content: center;
+    }
+    #panel-modal-overlay.show { display: flex; }
+    #panel-modal {
+      background: #252525; border-radius: 8px; padding: 36px 16px 16px 16px; max-width: 320px; width: 90%;
+      position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+      max-height: 85vh; overflow-y: auto;
+    }
+    #modal-img-wrap { position: relative; margin-bottom: 10px; }
+    #modal-img-wrap img { width: 100%; border-radius: 4px; display: block; cursor: pointer; }
+    #modal-img-wrap .modal-img-badge {
+      position: absolute; top: 6px; right: 6px; background: rgba(0,0,0,0.6);
+      color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 3px;
+      pointer-events: none; letter-spacing: 0.3px;
+    }
+    #panel-modal .modal-close {
+      position: absolute; top: 10px; right: 10px; background: rgba(30,30,30,0.85);
+      border: none; color: #ccc; font-size: 16px; cursor: pointer; line-height: 1;
+      z-index: 10; border-radius: 50%; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #panel-modal .modal-close:hover { color: #fff; }
+    #panel-modal p { margin: 3px 0; font-size: 12px; color: #ccc; border-bottom: 1px solid #333; padding-bottom: 3px; }
+    #panel-modal .modal-history p { color: #aaa; font-size: 11px; }
   </style>
 </head>
 <body>
@@ -133,6 +236,7 @@
       </div>
     </div>
 
+    <span id="btn-fav-star" onclick="toggleFavoriteStar()" title="Filtrar favoritas">★</span>
     <span class="filter-button" id="filter-online">Online</span>
     <span class="filter-button" id="filter-recent">Recente</span>
     <span class="filter-button" id="filter-all">Todos</span>
@@ -142,10 +246,56 @@
   <div class="top-bar-right">
     <div class="filters-group-wrapper" id="filter-dropdowns"></div>
     <button class="btn-clear-all" onclick="clearAllFilters()">Limpar Tudo</button>
+    <button id="hamburger-btn" onclick="toggleSidePanel()" title="Lista completa">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </div>
 
 <div id="galeria"></div>
+
+<!-- Painel lateral -->
+<div id="side-panel">
+  <div id="side-panel-header">
+    <input type="text" id="panel-search" placeholder="Buscar nome..." oninput="panelSearch()" style="padding-right:26px;">
+    <button id="panel-search-clear" onclick="clearPanelSearch()" title="Limpar" style="margin-left:-30px;background:none;border:none;color:#888;font-size:13px;cursor:pointer;line-height:1;display:none;flex-shrink:0;">✕</button>
+    <span id="panel-row-counter" style="font-size:11px;color:#7ab;white-space:nowrap;flex-shrink:0">0 salas</span>
+    <div id="panel-status-filter">
+      <button class="panel-status-btn active" data-pstatus="all"    onclick="setPanelStatus('all')">Todos</button>
+      <button class="panel-status-btn"         data-pstatus="online" onclick="setPanelStatus('online')">Online</button>
+      <button class="panel-status-btn"         data-pstatus="recent" onclick="setPanelStatus('recent')">Recente</button>
+      <button class="panel-status-btn"         data-pstatus="absent" onclick="setPanelStatus('absent')">Ausentes</button>
+      <button class="panel-status-btn"         data-pstatus="never"  onclick="setPanelStatus('never')">Nunca</button>
+    </div>
+  </div>
+  <div id="panel-table-wrap">
+    <table id="panel-table">
+      <thead>
+        <tr>
+          <th onclick="setPanelSort('status')"  data-col="status">Status<span class="sort-arrow"></span></th>
+          <th onclick="setPanelSort('name')"    data-col="name">Nome<span class="sort-arrow"></span></th>
+          <th onclick="setPanelSort('session')" data-col="session">Última sessão<span class="sort-arrow"></span></th>
+          <th onclick="setPanelSort('dur')"     data-col="dur">Duração<span class="sort-arrow"></span></th>
+          <th onclick="setPanelSort('absent')"  data-col="absent">Ausente há<span class="sort-arrow"></span></th>
+        </tr>
+      </thead>
+      <tbody id="panel-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal card -->
+<div id="panel-modal-overlay" onclick="closePanelModal(event)">
+  <div id="panel-modal">
+    <button class="modal-close" onclick="closePanelModal()">✖</button>
+    <div id="modal-img-wrap">
+      <img id="modal-img" src="" alt="">
+      <span class="modal-img-badge">↗ Recu.me</span>
+    </div>
+    <div id="modal-info"></div>
+    <div class="modal-history" id="modal-history"></div>
+  </div>
+</div>
 
 <script src="listname.js"></script>
 
@@ -194,6 +344,65 @@
     } catch (e) { return 0; }
   }
 
+  // === Detecção de CORTE (sala fechada) por análise das margens ===
+  // Lê os 10% superiores e os 10% inferiores da thumb. Considera CORTE quando
+  // as duas faixas são muito uniformes (>=95% dos pixels perto da média da faixa)
+  // E têm cor parecida entre si (diferença <=10). Independe da cor de fundo:
+  // se a plataforma trocar o cinza por outra cor, continua pegando.
+  function margensSaoCorte(ctx, w, h) {
+    const faixa = Math.max(1, Math.floor(h * 0.10));
+    const banda = (y0, alt) => {
+      const d = ctx.getImageData(0, y0, w, alt).data;
+      const n = d.length / 4;
+      let sr = 0, sg = 0, sb = 0;
+      for (let i = 0; i < d.length; i += 4) { sr += d[i]; sg += d[i + 1]; sb += d[i + 2]; }
+      const mr = sr / n, mg = sg / n, mb = sb / n;
+      let near = 0;
+      for (let j = 0; j < d.length; j += 4) {
+        if (Math.abs(d[j] - mr) <= 8 && Math.abs(d[j + 1] - mg) <= 8 && Math.abs(d[j + 2] - mb) <= 8) near++;
+      }
+      return { mean: [mr, mg, mb], uniform: 100 * near / n };
+    };
+    const topo = banda(0, faixa);
+    const base = banda(h - faixa, faixa);
+    const dif = Math.max(
+      Math.abs(topo.mean[0] - base.mean[0]),
+      Math.abs(topo.mean[1] - base.mean[1]),
+      Math.abs(topo.mean[2] - base.mean[2])
+    );
+    return topo.uniform >= 95 && base.uniform >= 95 && dif <= 10;
+  }
+
+  // Baixa a thumb UMA vez e devolve { size (KB), isCorte }.
+  // O size (blob.size) continua alimentando a lógica de "imagem estática = offline".
+  async function analisarThumb(url) {
+    try {
+      const resp = await fetch(url);
+      const blob = await resp.blob();
+      const size = blob.size / 1024;
+      if (!blob.size) return { size: 0, isCorte: false };
+      let bmp;
+      try { bmp = await createImageBitmap(blob); }
+      catch (e) { return { size, isCorte: false }; }
+      const w = bmp.width, h = bmp.height;
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      const ctx = cv.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(bmp, 0, 0);
+      if (bmp.close) bmp.close();
+      const isCorte = margensSaoCorte(ctx, w, h);
+      return { size, isCorte };
+    } catch (e) { return { size: 0, isCorte: false }; }
+  }
+
+  function formatDateTime(timestamp) {
+    const d = new Date(timestamp);
+    const pad = (n) => n.toString().padStart(2, '0');
+    const dateStr = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+    const timeStr = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return `${dateStr} ${timeStr}`;
+  }
+
   function startCountdown(seconds) {
     const status = document.getElementById("status-load");
     if (countdownInterval) clearInterval(countdownInterval);
@@ -239,6 +448,9 @@
       if (isVisible) visibleCount++;
     });
     document.getElementById('room-counter').innerText = `Exibindo ${visibleCount} salas`;
+    // Atualiza painel se estiver aberto
+    const panel = document.getElementById('side-panel');
+    if (panel && panel.classList.contains('open')) renderPanelTable();
   }
 
   function renderGaleria(processedData) {
@@ -248,22 +460,28 @@
       if (u.sizePass) {
         const targetHref = getTargetLink(u.name);
         const starClass = u.favorite === "★" ? "star-favorite star-active" : "star-favorite";
+        
+        // Se a imagem for estática (offline/isGrey), o tempo fica cinza. Se estiver online, usa a cor do ciclo (verde/amarelo/laranja)
+        const timeColorClass = u.isGrey ? "text-grey" : u.cycleClass;
+
         bufferHtml += `
           <a href="${targetHref}" class="image-wrapper" target="_blank" data-name="${u.name}" data-grey="${u.isGrey}">
             <div class="thumbnail-container">
               <img width="192" height="108" src="https://thumb.live.mmcdn.com/riw/${u.name}.jpg?12345" class="room_thumbnail" loading="lazy" onmouseenter="handleImageHover(this, '${u.name}')" onmouseleave="stopImageHover('${u.name}')">
               <div class="user-footer">
-                <span class="cycle-count ${u.cycleClass}">${u.timeLabel}</span>
+                <span class="cycle-count ${timeColorClass}">${u.timeLabel}</span>
                 <span class="name-text ${u.isGrey ? 'text-grey' : ''}">${u.name}</span>
                 <span class="star-dock"><span class="${starClass}">${u.favorite}</span></span>
               </div>
               <div class="info-overlay">
-                <p><strong>Name:</strong> ${u.name}</p>
-                <p><strong>Age:</strong> ${u.age_group}</p>
-                <p><strong>Ethnicity:</strong> ${u.ethnicity}</p>
-                <p><strong>Physical:</strong> ${u.physical}</p>
-                <p><strong>Type A:</strong> ${u.type_a}</p>
-                <p><strong>Type B:</strong> ${u.type_b}</p>
+                <p><span class="ov-label">Name:</span> <span class="ov-val">${u.name}</span></p>
+                <p><span class="ov-label">Age:</span> <span class="ov-val">${u.age_group}</span></p>
+                <p><span class="ov-label">Ethnicity:</span> <span class="ov-val">${u.ethnicity}</span></p>
+                <p><span class="ov-label">Physical:</span> <span class="ov-val">${u.physical}</span></p>
+                <p><span class="ov-label">Type A:</span> <span class="ov-val">${u.type_a}</span></p>
+                <p><span class="ov-label">Type B:</span> <span class="ov-val">${u.type_b}</span></p>
+                ${(() => { const ai = calcAbsenceInfo(u); if (u.isGrey && ai.lastSession) { return `<p><span class="ov-label">Última sessão:</span> <span class="ov-val">${ai.lastSession}</span></p><p><span class="ov-label">Ausente há:</span> <span class="ov-val ${ai.cls}">${ai.label}</span></p>`; } if (!u.isGrey && u.sessionHistory && u.sessionHistory.length > 0) { const last = u.sessionHistory[u.sessionHistory.length - 1]; const m = last.match(/^(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2})/); const lastDate = m ? m[1] : last; return `<p><span class="ov-label">Última sessão:</span> <span class="ov-val">${lastDate}</span></p>`; } return ''; })()}
+                ${u.sessionHistory && u.sessionHistory.length > 0 ? `<p style="margin-bottom:0;"><span class="ov-label">Histórico:</span></p>${u.sessionHistory.slice().reverse().map(h => `<p class="ov-val" style="margin-top:0;">${h}</p>`).join('')}` : ''}
               </div>
             </div>
           </a>`;
@@ -278,32 +496,86 @@
     let processedData = [];
     const batchSize = 40;
     const oldCycleData = JSON.parse(localStorage.getItem('online_cycles') || '{}');
+    // wasOnline: guarda quais salas estavam online no ciclo anterior
+    const wasOnlineData = JSON.parse(localStorage.getItem('was_online') || '{}');
+    // sessionStart: guarda o timestamp de início da sessão online atual de cada sala
+    const sessionStartData = JSON.parse(localStorage.getItem('session_start') || '{}');
+    // sessionHistory: histórico de sessões anteriores por sala [ "dd/mm/aaaa hh:mm - Xmin", ... ]
+    const sessionHistory = JSON.parse(localStorage.getItem('session_history') || '{}');
     const newCycleData = {};
+    const newWasOnline = {};
+    const newSessionStart = {};
 
     for (let i = 0; i < USUARIOS_DATA.length; i += batchSize) {
       const batch = USUARIOS_DATA.slice(i, i + batchSize);
       const batchResults = await Promise.all(batch.map(async (u) => {
         const imageUrl = `https://thumb.live.mmcdn.com/riw/${u.name}.jpg?12345`;
-        const size = await getImageSizeInKb(imageUrl);
+        const analise = await analisarThumb(imageUrl);
+        const size = analise.size;
         const stored = localStorage.getItem(imageUrl);
-        const isGrey = (stored && parseFloat(stored) === size);
+        const isPlaceholder = analise.isCorte;
+        const isGrey = isPlaceholder || (stored && parseFloat(stored) === size);
         localStorage.setItem(imageUrl, size.toString());
-        let timeLabel = "-"; let cycleClass = ""; let totalMinutes = 0;
+        
+        let timeLabel = "-"; 
+        let cycleClass = "cycle-yellow";
+        let totalMinutes = 0;
+        
+        const wasOnline = !!wasOnlineData[u.name];
+
         if (!isGrey) {
+            // SALA ONLINE: conta apenas os ciclos desta sessão atual
             const currentCycles = (oldCycleData[u.name] || 0) + 1;
             newCycleData[u.name] = currentCycles;
+            newWasOnline[u.name] = true;
+            // Se acabou de ficar online agora, registra o início da sessão
+            newSessionStart[u.name] = wasOnline ? sessionStartData[u.name] : Date.now();
             totalMinutes = Math.floor(currentCycles * 2.5);
             timeLabel = totalMinutes + " min";
-            if (totalMinutes <= 15) cycleClass = "cycle-green";
-            else if (totalMinutes >= 120) cycleClass = "cycle-orange";
+            
+            if (totalMinutes <= 15) {
+                cycleClass = "cycle-green";
+            } else if (totalMinutes >= 120) {
+                cycleClass = "cycle-orange";
+            } else {
+                cycleClass = "cycle-yellow";
+            }
+        } else {
+            // SALA OFFLINE: verifica se acabou de ficar offline
+            if (wasOnline && oldCycleData[u.name]) {
+                // Acabou de cair: guarda o tempo desta sessão no histórico (apenas se > 15 min)
+                const minutesThisSession = Math.floor(oldCycleData[u.name] * 2.5);
+                if (minutesThisSession > 15) {
+                    if (!sessionHistory[u.name]) sessionHistory[u.name] = [];
+                    const startTs = sessionStartData[u.name];
+                    const startLabel = startTs ? formatDateTime(startTs) : "?";
+                    sessionHistory[u.name].push(`${startLabel} - ${minutesThisSession} min`);
+                    // Mantém somente os 10 registros mais recentes
+                    if (sessionHistory[u.name].length > 10) {
+                        sessionHistory[u.name] = sessionHistory[u.name].slice(-10);
+                    }
+                }
+            }
+            // Zera os ciclos para que quando voltar comece do zero
+            newCycleData[u.name] = 0;
+            newWasOnline[u.name] = false;
+            newSessionStart[u.name] = null;
+            timeLabel = "-";
         }
-        return { ...u, isGrey, timeLabel, cycleClass, totalMinutes, sizePass: (size > 9.29 || size < 9.27) };
+        
+        const history = sessionHistory[u.name] || [];
+        return { ...u, isGrey, timeLabel, cycleClass, totalMinutes, sizePass: !isPlaceholder && size > 0, sessionHistory: history };
       }));
       processedData.push(...batchResults);
-      // Atualiza apenas a porcentagem no elemento ao lado do timer
       syncStatus.innerText = `Sinc: ${Math.round((processedData.length/USUARIOS_DATA.length)*100)}%`;
     }
+    
     localStorage.setItem('online_cycles', JSON.stringify(newCycleData));
+    localStorage.setItem('was_online', JSON.stringify(newWasOnline));
+    localStorage.setItem('session_start', JSON.stringify(newSessionStart));
+    localStorage.setItem('session_history', JSON.stringify(sessionHistory));
+    
+    
     lastProcessedData = processedData;
     renderGaleria(processedData);
     
@@ -324,13 +596,31 @@
     event.stopPropagation();
     const idx = activeFilters[field].indexOf(val);
     if (idx > -1) activeFilters[field].splice(idx, 1); else activeFilters[field].push(val);
+    if (field === 'favorite') syncFavStarUI();
     renderDropdowns(); applyAllFilters();
     document.getElementById('dropdown-content-' + field).classList.add('show');
   }
 
+  function toggleFavoriteStar() {
+    const star = document.getElementById('btn-fav-star');
+    const isActive = star.classList.toggle('active');
+    if (isActive) {
+      if (!activeFilters.favorite.includes('★')) activeFilters.favorite.push('★');
+    } else {
+      activeFilters.favorite = activeFilters.favorite.filter(v => v !== '★');
+    }
+    renderDropdowns(); applyAllFilters();
+  }
+
+  function syncFavStarUI() {
+    const star = document.getElementById('btn-fav-star');
+    if (activeFilters.favorite.includes('★')) star.classList.add('active');
+    else star.classList.remove('active');
+  }
+
   function clearAllFilters() {
     Object.keys(activeFilters).forEach(f => activeFilters[f] = []);
-    renderDropdowns(); applyAllFilters();
+    syncFavStarUI(); renderDropdowns(); applyAllFilters();
   }
 
   function renderDropdowns() {
@@ -338,7 +628,7 @@
     container.innerHTML = '';
     Object.keys(activeFilters).forEach(field => {
       let values = []; let label = field.replace('_',' ').toUpperCase();
-      if (field === 'online_time') { values = ["Abaixo de 15 min", "Entre 15 e 120 min", "Acima de 120 min"]; label = "⏱️ TEMPO"; }
+      if (field === 'online_time') { values = ["Abaixo de 15 min", "Entre 15 e 120 min", "Acima de 120 min"]; label = "⏱️ ONLINE"; }
       else { values = [...new Set(USUARIOS_DATA.map(u => u[field]))].sort(); }
       const count = activeFilters[field].length;
       let html = `<div class="dropdown"><button class="dropbtn" onclick="toggleDropdown('${field}', event)">${label}${count > 0 ? `<span class="filter-counter">${count}</span>` : ''}</button><div class="dropdown-content" id="dropdown-content-${field}">`;
@@ -353,16 +643,315 @@
     }
   }
 
+  // ════════════════════════════════════════════
+  // PAINEL LATERAL
+  // ════════════════════════════════════════════
+  let panelStatusFilter = 'all';
+  let panelSearchTerm = '';
+  let panelSearchIndex = 0;
+  let panelSearchMatches = [];
+  let panelSortCol = 'absent';
+  let panelSortAsc = true;
+
+  function toggleSidePanel() {
+    const panel = document.getElementById('side-panel');
+    panel.classList.toggle('open');
+    if (panel.classList.contains('open')) {
+      renderPanelTable();
+      document.getElementById('panel-search').focus();
+    }
+  }
+
+  function setPanelStatus(status) {
+    panelStatusFilter = status;
+    document.querySelectorAll('.panel-status-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.pstatus === status);
+    });
+    renderPanelTable();
+  }
+
+  // Calcula tempo ausente a partir do histórico da sala
+  function calcAbsenceInfo(u) {
+    // Se online agora: sem ausência
+    if (!u.isGrey) return { ts: null, label: '—', cls: '', sortVal: -1 };
+
+    // Pega o histórico — formato de cada entrada: "dd/mm/aaaa hh:mm - Xmin"
+    const hist = u.sessionHistory || [];
+
+    // Procura o registro mais recente que conseguir parsear (do fim para o início)
+    let bestMatch = null;
+    for (let i = hist.length - 1; i >= 0; i--) {
+      const m = hist[i].match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})\s+-\s+(\d+)\s+min/);
+      if (m) { bestMatch = m; break; }
+    }
+
+    if (!bestMatch) {
+      // Sem histórico válido: exibe o último texto bruto se existir
+      const raw = hist.length > 0 ? hist[hist.length - 1] : '—';
+      return { ts: null, label: 'Nunca', cls: 'absent-stale', sortVal: Number.MAX_SAFE_INTEGER, lastSession: raw, duration: '—' };
+    }
+
+    const [, dd, mm, yyyy, hh, mi, mins] = bestMatch;
+    const startTs = new Date(+yyyy, +mm - 1, +dd, +hh, +mi).getTime();
+    const endTs   = startTs + (+mins * 60 * 1000);
+    const diffMs  = Date.now() - endTs;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHr  = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHr / 24);
+
+    let label, cls;
+    if (diffMin < 0) {
+      // endTs no futuro (clock skew): trata como agora
+      label = '0min'; cls = 'absent-fresh';
+    } else if (diffMin < 60) {
+      label = diffMin + 'min';
+      cls = 'absent-fresh';
+    } else if (diffHr < 24) {
+      label = diffHr + 'h';
+      cls = diffHr < 3 ? 'absent-fresh' : diffHr < 12 ? 'absent-mid' : 'absent-old';
+    } else {
+      label = diffDay + 'd';
+      cls = diffDay < 3 ? 'absent-old' : 'absent-stale';
+    }
+
+    // endLabel = data/hora de saída calculada (início + duração)
+    const endDate = new Date(endTs);
+    const pad = n => n.toString().padStart(2, '0');
+    const endLabel = pad(endDate.getDate()) + '/' + pad(endDate.getMonth()+1) + '/' + endDate.getFullYear()
+                   + ' ' + pad(endDate.getHours()) + ':' + pad(endDate.getMinutes());
+
+    return { ts: endTs, label, cls, sortVal: diffMin, lastSession: endLabel, duration: mins + ' min' };
+  }
+
+  function passesActiveFilters(u) {
+    for (let field in activeFilters) {
+      if (field === 'online_time') continue;
+      if (activeFilters[field].length > 0 && !activeFilters[field].includes(u[field])) return false;
+    }
+    if (activeFilters.online_time.length > 0) {
+      const mins = u.totalMinutes || 0;
+      let ok = false;
+      if (activeFilters.online_time.includes("Abaixo de 15 min") && mins <= 15) ok = true;
+      if (activeFilters.online_time.includes("Entre 15 e 120 min") && mins > 15 && mins < 120) ok = true;
+      if (activeFilters.online_time.includes("Acima de 120 min") && mins >= 120) ok = true;
+      if (!ok) return false;
+    }
+    return true;
+  }
+
+  function setPanelSort(col) {
+    if (panelSortCol === col) {
+      panelSortAsc = !panelSortAsc;
+    } else {
+      panelSortCol = col;
+      panelSortAsc = true;
+    }
+    renderPanelTable();
+  }
+
+  function updateSortArrows() {
+    document.querySelectorAll('#panel-table thead th[data-col]').forEach(th => {
+      const arrow = th.querySelector('.sort-arrow');
+      if (!arrow) return;
+      if (th.dataset.col === panelSortCol) {
+        arrow.textContent = panelSortAsc ? ' ▲' : ' ▼';
+        th.classList.add('sort-active');
+      } else {
+        arrow.textContent = '';
+        th.classList.remove('sort-active');
+      }
+    });
+  }
+
+  function renderPanelTable() {
+    if (!lastProcessedData || lastProcessedData.length === 0) return;
+
+    // Sempre lê o histórico direto do localStorage para ter o dado mais atualizado
+    const sessionHistory = JSON.parse(localStorage.getItem('session_history') || '{}');
+
+    // Montar lista completa: processed + ausentes (sizePass=false mas existem em USUARIOS_DATA)
+    const processedNames = new Set(lastProcessedData.map(u => u.name));
+
+    // Para salas já processadas, sobrescreve sessionHistory com dado do localStorage
+    const allEntries = lastProcessedData.map(u => ({
+      ...u,
+      sessionHistory: sessionHistory[u.name] || u.sessionHistory || []
+    }));
+
+    // Ausentes puros: estão em USUARIOS_DATA mas não passaram no sizePass
+    USUARIOS_DATA.forEach(u => {
+      if (!processedNames.has(u.name)) {
+        allEntries.push({ ...u, isGrey: true, timeLabel: '-', cycleClass: '', totalMinutes: 0,
+          sizePass: false, sessionHistory: sessionHistory[u.name] || [] });
+      }
+    });
+
+    // Enriquecer com info de ausência
+    let rows = allEntries.map(u => ({ ...u, absenceInfo: calcAbsenceInfo(u) }));
+
+    // Filtro de status do painel
+    rows = rows.filter(u => {
+      if (panelStatusFilter === 'online') return !u.isGrey;
+      if (panelStatusFilter === 'recent') return u.isGrey && u.sizePass;
+      if (panelStatusFilter === 'absent') return u.isGrey && !u.sizePass;
+      if (panelStatusFilter === 'never')  return u.isGrey && (u.sessionHistory || []).length === 0;
+      return true; // all
+    });
+
+    // Filtros globais (age_group, ethnicity etc.)
+    rows = rows.filter(u => passesActiveFilters(u));
+
+    // Filtro de busca
+    if (panelSearchTerm) {
+      rows = rows.filter(u => u.name.toLowerCase().includes(panelSearchTerm));
+    }
+
+    // Ordenação dinâmica por coluna
+    rows.sort((a, b) => {
+      let va, vb;
+      if (panelSortCol === 'status') {
+        va = a.isGrey ? (a.sizePass ? 1 : 2) : 0;
+        vb = b.isGrey ? (b.sizePass ? 1 : 2) : 0;
+      } else if (panelSortCol === 'name') {
+        va = a.name.toLowerCase(); vb = b.name.toLowerCase();
+      } else if (panelSortCol === 'session') {
+        va = a.absenceInfo.ts || 0; vb = b.absenceInfo.ts || 0;
+      } else if (panelSortCol === 'dur') {
+        va = parseInt(a.absenceInfo.duration) || 0;
+        vb = parseInt(b.absenceInfo.duration) || 0;
+      } else { // absent (padrão)
+        va = a.absenceInfo.sortVal; vb = b.absenceInfo.sortVal;
+      }
+      if (va < vb) return panelSortAsc ? -1 : 1;
+      if (va > vb) return panelSortAsc ? 1 : -1;
+      return 0;
+    });
+
+    // Atualizar contador
+    const counter = document.getElementById('panel-row-counter');
+    if (counter) counter.textContent = rows.length + ' sala' + (rows.length !== 1 ? 's' : '');
+
+    const tbody = document.getElementById('panel-tbody');
+    let html = '';
+    rows.forEach((u, idx) => {
+      const ai = u.absenceInfo;
+      let dotClass = u.isGrey ? (u.sizePass ? 'dot-recent' : 'dot-absent') : 'dot-online';
+      const lastSess = ai.lastSession || '—';
+      const dur = ai.duration || (u.isGrey ? '—' : u.timeLabel);
+      const isFav = u.favorite === '★';
+      const favStar = `<span style="color:${isFav ? '#ffdb58' : '#333'};margin-right:4px;font-size:12px">★</span>`;
+      html += `<tr data-name="${u.name}" onclick="openPanelModal('${u.name}')">
+        <td><span class="panel-status-dot ${dotClass}"></span></td>
+        <td title="${u.name}">${favStar}${u.name}</td>
+        <td>${lastSess}</td>
+        <td>${dur}</td>
+        <td class="${ai.cls}">${ai.label}</td>
+      </tr>`;
+    });
+    tbody.innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:#555;padding:20px">Nenhuma sala</td></tr>';
+    panelSearchMatches = [];
+    panelSearchIndex = 0;
+    updateSortArrows();
+  }
+
+  function clearPanelSearch() {
+    const inp = document.getElementById('panel-search');
+    inp.value = '';
+    document.getElementById('panel-search-clear').style.display = 'none';
+    panelSearchTerm = '';
+    renderPanelTable();
+    inp.focus();
+  }
+
+  function panelSearch() {
+    const inp = document.getElementById('panel-search');
+    panelSearchTerm = inp.value.toLowerCase().trim();
+    document.getElementById('panel-search-clear').style.display = panelSearchTerm ? 'inline' : 'none';
+    renderPanelTable();
+    // Após render, scroll para o primeiro match
+    if (panelSearchTerm) {
+      const rows = document.querySelectorAll('#panel-tbody tr');
+      panelSearchMatches = [];
+      rows.forEach(r => {
+        const name = (r.dataset.name || '').toLowerCase();
+        if (name.includes(panelSearchTerm)) panelSearchMatches.push(r);
+      });
+      panelSearchIndex = 0;
+      scrollToMatch();
+    }
+  }
+
+  function scrollToMatch() {
+    document.querySelectorAll('#panel-tbody tr.highlighted').forEach(r => r.classList.remove('highlighted'));
+    if (panelSearchMatches.length === 0) return;
+    const row = panelSearchMatches[panelSearchIndex % panelSearchMatches.length];
+    row.classList.add('highlighted');
+    row.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
+
+  // Enter navega para o próximo match
+  document.addEventListener('keydown', e => {
+    if (document.getElementById('side-panel').classList.contains('open') && e.key === 'Enter') {
+      if (document.activeElement.id === 'panel-search') {
+        panelSearchIndex++;
+        scrollToMatch();
+      }
+    }
+  });
+
+  function openPanelModal(name) {
+    const u = (lastProcessedData.find(x => x.name === name)) ||
+              (() => {
+                const base = USUARIOS_DATA.find(x => x.name === name) || { name };
+                const sessionHistory = JSON.parse(localStorage.getItem('session_history') || '{}');
+                return { ...base, isGrey: true, sessionHistory: sessionHistory[name] || [] };
+              })();
+
+    const recuUrl = `https://recu.me/performer/${name}/`;
+    document.getElementById('modal-img').src = `https://thumb.live.mmcdn.com/riw/${name}.jpg?t=${Date.now()}`;
+    document.getElementById('modal-img').style.cursor = 'pointer';
+    document.getElementById('modal-img').onclick = (e) => { e.stopPropagation(); window.open(recuUrl, '_blank'); };
+    document.getElementById('modal-info').innerHTML = `
+      <p><strong>Nome:</strong> ${u.name}</p>
+      <p><strong>Age:</strong> ${u.age_group || '—'}</p>
+      <p><strong>Ethnicity:</strong> ${u.ethnicity || '—'}</p>
+      <p><strong>Physical:</strong> ${u.physical || '—'}</p>
+      <p><strong>Type A:</strong> ${u.type_a || '—'}</p>
+      <p><strong>Type B:</strong> ${u.type_b || '—'}</p>`;
+
+    const hist = u.sessionHistory || [];
+    document.getElementById('modal-history').innerHTML = hist.length > 0
+      ? '<p style="color:#aaa;font-weight:bold;margin-top:8px">Histórico:</p>' +
+        hist.slice().reverse().map(h => `<p>${h}</p>`).join('')
+      : '<p style="color:#555;margin-top:8px">Sem histórico registrado.</p>';
+
+    document.getElementById('panel-modal-overlay').classList.add('show');
+  }
+
+  function closePanelModal(event) {
+    if (!event || event.target === document.getElementById('panel-modal-overlay') || !event.target.closest) {
+      document.getElementById('panel-modal-overlay').classList.remove('show');
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
-    const savedMode = localStorage.getItem('selectedViewMode') || 'Chaturbate';
-    document.getElementById('current-mode').innerText = savedMode;
+    const savedFilter = localStorage.getItem('selectedFilter') || 'all';
+    const autoMode = (savedFilter === 'online') ? 'Chaturbate' : 'Recu';
+    localStorage.setItem('selectedViewMode', autoMode);
+    document.getElementById('current-mode').innerText = autoMode;
     document.querySelectorAll('.filter-button').forEach(btn => {
       let type = btn.id.replace('filter-','');
       if(type === (localStorage.getItem('selectedFilter') || 'all')) btn.classList.add('selected');
       btn.onclick = () => { 
         localStorage.setItem('selectedFilter', type); 
         document.querySelectorAll('.filter-button').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected'); applyAllFilters();
+        btn.classList.add('selected');
+        // Troca o modo automaticamente conforme o filtro selecionado
+        const autoMode = (type === 'online') ? 'Chaturbate' : 'Recu';
+        localStorage.setItem('selectedViewMode', autoMode);
+        document.getElementById('current-mode').innerText = autoMode;
+        if (lastProcessedData.length > 0) renderGaleria(lastProcessedData);
+        applyAllFilters();
       };
     });
     renderDropdowns(); startSilentUpdate();
